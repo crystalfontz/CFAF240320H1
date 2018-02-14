@@ -286,3 +286,9 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+/arduino/.svn
+/st7789/.svn
+/__vm
+/CFAF240320H1.vcxproj.filters
+/CFAF240320H1.vcxproj
+/CFAF240320H1.sln
