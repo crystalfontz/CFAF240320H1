@@ -37,6 +37,7 @@ void displayInit(void)
 	delay(120);
 	clrCS();
 	setRD();
+	setWR();
 
 
 
@@ -108,22 +109,22 @@ void displayInit(void)
 	//  			  111: 14.97
 
 	//---------------------------------ST7789S Power setting--------------------------------------//
-	writeCommand(0x3A); // Interface Pixel Format
+	writeCommand(0x3a); // Interface Pixel Format
 	writeData(0x05);	// 65K of RGB interface - 16bit/pixel
 	// 	Bit	| Description                    | Comments
 	//  -------------------------------------------------------------------
-	// 	D7  | -                              | Set to ‘0’
+	// 	D7  | -                              | Set to ï¿½0ï¿½
 	//  -------------------------------------------------------------------
-	// 	D6  |                                | ‘101’ = 65K of RGB interface
-	// 	D5  | RGB interface color format     | ‘110’ = 262K of RGB
+	// 	D6  |                                | ï¿½101ï¿½ = 65K of RGB interface
+	// 	D5  | RGB interface color format     | ï¿½110ï¿½ = 262K of RGB
 	// 	D4  |                                | interface
 	//  -------------------------------------------------------------------
-	// 	D3  | -                              | Set to ‘0’
+	// 	D3  | -                              | Set to ï¿½0ï¿½
 	//  -------------------------------------------------------------------
-	// 	D2  |                                | ‘011’ = 12bit/pixel
-	// 	D1  | Control interface color format | ‘101’ = 16bit/pixel
-	// 	D0  |                                | ‘110’ = 18bit/pixel
-	// 	    |                                | ‘111’ = 16M truncated
+	// 	D2  |                                | ï¿½011ï¿½ = 12bit/pixel
+	// 	D1  | Control interface color format | ï¿½101ï¿½ = 16bit/pixel
+	// 	D0  |                                | ï¿½110ï¿½ = 18bit/pixel
+	// 	    |                                | ï¿½111ï¿½ = 16M truncated
 	//  -------------------------------------------------------------------
 
 	writeCommand(0x36);	// Memory Data Access Control
@@ -140,7 +141,7 @@ void displayInit(void)
 	// 	D0  | -    | Don't Care
 
 	writeCommand(0xbb);	// VCOM Setting
-	writeData(0x2B); 
+	writeData(0x2b);
 	// 	VCOMS[5:0] | VCOM (V) | VCOMS[5:0] | VCOM (V)
 	//  ---------------------------------------------
 	//  00h        | 0.1      | 20h        | 0.9
@@ -180,7 +181,7 @@ void displayInit(void)
 	writeData(0x01);
 
 	writeCommand(0xc3);	// VRH Set
-	writeData(0x0B);
+	writeData(0x0b);
 	// VRHS[5:0] | VAP(GVDD) (V)                   | VRHS[5:0] | VAP(GVDD) (V)
 	// -----------------------------------------------------------------------------------------
 	// 00h       | 3.55+(vcom+vcom offset+0.5vdv)  | 15h       | 4.6+( vcom+vcom offset+0.5vdv)
@@ -318,18 +319,18 @@ void displayInit(void)
 	//See datasheet for more information
 	writeData(0xd0);
 	writeData(0x00);
-	writeData(0x02);
-	writeData(0x07);
+	writeData(0x03);
+	writeData(0x08);
 	writeData(0x0a);
-	writeData(0x28);
-	writeData(0x32);
-	writeData(0x44);
-	writeData(0x42);
-	writeData(0x06);
-	writeData(0x0e);
-	writeData(0x12);
-	writeData(0x14);
 	writeData(0x17);
+	writeData(0x2e);
+	writeData(0x44);
+	writeData(0x3f);
+	writeData(0x29);
+	writeData(0x10);
+	writeData(0x0e);
+	writeData(0x14);
+	writeData(0x18);
 
 	writeCommand(0xe1);	// Negative Voltage Gamma Control
 	//See datasheet for more information
@@ -410,7 +411,8 @@ void setDisplayWindow(int x0, int y0, int x1, int y1)
 	writeData(y1>>8);	// Y address start:
 	writeData(y1);		// S <= YE <= Y
 
-	writeCommand(0x2C);
+	//This command is necessary to ensure the addresses are set correctly, do not remove
+	writeCommand(0x2c); // Memory write
 }
 // ********************************************************
 void setInterface(void)
@@ -440,7 +442,9 @@ void setInterface(void)
 void writeColorBars(void)
 {
 	unsigned int i,j;
-
+	
+	setDisplayWindow( 0x0000, 0x0000, 0x00EF, 0x013F);
+	
 	setDisplayWindow(0x0000, 0x0000, 0x00EF, 0x013F);
 
 	for(i=0;i<320;i++)

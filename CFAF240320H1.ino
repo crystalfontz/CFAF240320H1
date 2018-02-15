@@ -80,7 +80,7 @@
 #define controllerPath "../arduino/arduino.h"
 
 #include "st7789/st7789.c"
-#include "arduino/arduino.c"
+#include "atmega328/atmega328.c"
 
 #include <SoftwareSerial.h>
 
