@@ -5,10 +5,9 @@
  *  Author: max
  */ 
 
+#include <avr/io.h>
 #ifndef __ST7789_H__
 #define __ST7789_H__
-
-#include "../atmega2561/atmega2561.h"
 
 // color definitions
 #define	BLACK   0x0000
@@ -19,6 +18,23 @@
 #define MAGENTA 0xF81F
 #define YELLOW  0xFFE0
 #define WHITE   0xFFFF
+
+extern void writeCommand(uint8_t command);
+extern void writeData(uint8_t data);
+extern void writeColor(uint16_t color);
+extern uint8_t readData(void);
+extern void clrCS(void);
+extern void setCS(void);
+extern void clrRS(void);
+extern void setRS(void);
+extern void clrWR(void);
+extern void setWR(void);
+extern void clrRD(void);
+extern void setRD(void);
+extern void clrRESET(void);
+extern void setRESET(void);
+extern void uPInit(char* interfaceType);
+
 
 void clearScreen(void);
 void displayHome(void);

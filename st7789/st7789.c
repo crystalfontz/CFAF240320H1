@@ -1,5 +1,16 @@
 #include "st7789.h"
 
+
+//============================================================================
+//
+// Verify the specific pinnout of the display you're using on the datasheet and
+// properly connect it based on the selected micro processor control lines 
+//
+//============================================================================
+//
+//============================================================================
+
+
 // ********************************************************
 void clearScreen(void)
 {
@@ -16,46 +27,87 @@ void clearScreen(void)
 // ********************************************************
 void displayInit(void)
 {
-	SET_RESET
+	//initialize the microprocessor
+	uPInit("8-bit parallel");
+	setRESET();
 	delay(1);
-	CLR_RESET
+	clrRESET();
 	delay(10);
-	SET_RESET
+	setRESET();
 	delay(120);
-	CLR_CS
-	SET_RD
+	clrCS();
+	setRD();
 
-	writeCommand(0xb2); // Porch Control
-	writeData(0x0c);	// BPA[0:6] - Back porch setting in normal mode. The minimum setting is 0x01 
-	writeData(0x0c);	// FPA[0:6] - Front porch setting in normal mode. The minimum setting is 0x01
-	writeData(0x00);	// PSEN - Enable separate porch control
-	writeData(0x33);	// BPB[0:3] - Back porch setting in idle mode. The minimum setting is 0x01
-						// FPB[0:3] - Front porch setting in idle mode. The minimum setting is 0x01
-	writeData(0x33);	// BPC[0:3] - Back porch setting in partial mode. The minimum setting is 0x01
-						// FPC[0:3] - Front porch setting in partial mode. The minimum setting is 0x01
 
-	writeCommand(0xb7); // Gate Control
-	writeData(0x35);	// VGHS[2:0] & VGLS[2:0]
-	//VGHS[2:0] VGH (V)
-	//00h       12.2
-	//01h       12.54
-	//02h       12.89
-	//03h       13.26
-	//04h       13.65
-	//05h       14.06
-	//06h       14.5
-	//07h       14.97
-	
-	//VGLS[2:0]  VGL (V)
-	//00h        -7.16
-	//01h        -7.67
-	//02h        -8.23
-	//03h        -8.87
-	//04h        -9.6
-	//05h        -10.43
-	//06h        -11.38
-	//07h        -12.5
 
+
+
+
+	//--------------------------------ST7789S Frame rate setting----------------------------------// 
+	//Porch Setting
+	writeCommand(0xb2);
+	//	  1011 0010
+	writeData(0x0c);
+	// 0000 1100
+	// 0XXX XXXX
+	//	||| ||||--	BPA6:BPA0
+	//				  Back porch setting in normal mode. Minimum setting is 0x01
+
+	writeData(0x0c);
+	// 0000 1100
+	// 0XXX XXXX
+	//	||| ||||--	FPA6:FPA0
+	//				  Front porch setting in normal mode. Minimum setting is 0x01
+
+	writeData(0x00);
+	// 0000 0000
+	// 0000 000X
+	//		   |--	PSEN
+	//				>>0: Disable separate porch control
+	//				  1: Disable separate porch control
+	writeData(0x33);
+	// 0011 0011
+	// XXXX XXXX
+	// |||| ||||--	FPB3:FPB0
+	// ||||			  Front porch setting in idle mode. The minimum setting is 0x01
+	// ||||
+	// ||||-------	BPB3:BPB0
+	//				  Back porch setting in idle mode. The minimum setting is 0x01
+	writeData(0x33);
+	// 0011 0011
+	// XXXX XXXX
+	// |||| ||||--	FPC3:FPC0
+	// ||||			  Front porch setting in partial mode. The minimum setting is 0x01
+	// ||||
+	// ||||-------	BPC3:BPC0
+	//				  Back porch setting in partial mode. The minimum setting is 0x01
+	//Gate Control
+	writeCommand(0xb7);
+	//	  1011 0111
+	writeData(0x35);
+	// 0011 0101
+	// 0XXX 0XXX
+	//  |||	 |||--	VGL Setting
+	//  |||			  000: -7.16
+	//  |||			  001: -7.67
+	//  |||			  010: -8.23
+	//  |||			  011: -8.87
+	//  |||			  100: -9.6
+	//  |||			>>101: -10.43
+	//  |||			  110: -11.38
+	//  |||			  111: -12.5
+	//  |||
+	//  |||-------	VGH Setting
+	//  			  000: 12.2
+	//  			  001: 12.54
+	//  			  010: 12.89
+	//  			>>011: 13.26
+	//  			  100: 13.65
+	//  			  101: 14.06
+	//  			  110: 14.5
+	//  			  111: 14.97
+
+	//---------------------------------ST7789S Power setting--------------------------------------//
 	writeCommand(0x3A); // Interface Pixel Format
 	writeData(0x05);	// 65K of RGB interface - 16bit/pixel
 	// 	Bit	| Description                    | Comments
@@ -88,7 +140,7 @@ void displayInit(void)
 	// 	D0  | -    | Don't Care
 
 	writeCommand(0xbb);	// VCOM Setting
-	writeData(0x2A);
+	writeData(0x2B); 
 	// 	VCOMS[5:0] | VCOM (V) | VCOMS[5:0] | VCOM (V)
 	//  ---------------------------------------------
 	//  00h        | 0.1      | 20h        | 0.9
@@ -124,8 +176,11 @@ void displayInit(void)
 	// 	1Eh        | 0.85     | 3Eh        | 1.65
 	// 	1Fh        | 0.875    | 3Fh        | 1.675
 
+	writeCommand(0xc2);
+	writeData(0x01);
+
 	writeCommand(0xc3);	// VRH Set
-	writeData(0x0A);
+	writeData(0x0B);
 	// VRHS[5:0] | VAP(GVDD) (V)                   | VRHS[5:0] | VAP(GVDD) (V)
 	// -----------------------------------------------------------------------------------------
 	// 00h       | 3.55+(vcom+vcom offset+0.5vdv)  | 15h       | 4.6+( vcom+vcom offset+0.5vdv)
@@ -258,6 +313,7 @@ void displayInit(void)
 	// 02h       | 2.4
 	// 03h       | 2.51
 
+	//--------------------------------ST7789S gamma setting---------------------------------------// 
 	writeCommand(0xe0);	// Positive Voltage Gamma Control
 	//See datasheet for more information
 	writeData(0xd0);
@@ -279,18 +335,18 @@ void displayInit(void)
 	//See datasheet for more information
 	writeData(0xd0);
 	writeData(0x00);
-	writeData(0x02);
-	writeData(0x07);
+	writeData(0x03);
+	writeData(0x08);
 	writeData(0x0a);
-	writeData(0x28);
-	writeData(0x31);
-	writeData(0x54);
-	writeData(0x47);
-	writeData(0x0e);
-	writeData(0x1c);
 	writeData(0x17);
-	writeData(0x1b);
-	writeData(0x1e);
+	writeData(0x2e);
+	writeData(0x44);
+	writeData(0x3f);
+	writeData(0x29);
+	writeData(0x10);
+	writeData(0x0e);
+	writeData(0x14);
+	writeData(0x18);
 
 	//Set the display window to the full size of the display
 	setDisplayWindow( 0x0000, 0x0000, 0x00EF, 0x013F);
@@ -338,7 +394,6 @@ void readID(void)
 	{
 		displayID[x] = readData();
 	}
-	while(1);
 }
 //*********************************************************
 void setDisplayWindow(int x0, int y0, int x1, int y1)
@@ -354,6 +409,8 @@ void setDisplayWindow(int x0, int y0, int x1, int y1)
 	writeData(y0);		// 0 <= YS <= Y
 	writeData(y1>>8);	// Y address start:
 	writeData(y1);		// S <= YE <= Y
+
+	writeCommand(0x2C);
 }
 // ********************************************************
 void setInterface(void)
@@ -377,12 +434,14 @@ void setInterface(void)
 #endif
 
 	// PORTF is directly mapped to IM[0:3]
-	PORTF = (IM[3]<<3 | IM[2]<<2 | IM[1]<<1 | IM[0]<<0);
+	// PORTF = (IM[3]<<3 | IM[2]<<2 | IM[1]<<1 | IM[0]<<0);
 }
 // ********************************************************
 void writeColorBars(void)
 {
 	unsigned int i,j;
+
+	setDisplayWindow(0x0000, 0x0000, 0x00EF, 0x013F);
 
 	for(i=0;i<320;i++)
 	{
@@ -423,3 +482,86 @@ void writeColorBars(void)
 		}
 	}
 }
+//void pictureSlideShow()
+//{
+//	uint8_t  i;              //loop variable
+//	uint16_t j;              //loop variable
+//	uint32_t p;              //cluster
+//	uint16_t *buffer;        //buffer
+//	uint16_t pics = 1;
+//	uint16_t totalFiles = 0;
+//	uint16_t slideshowFlag = 1;
+//	uint8_t  sector;
+//	uint32_t pixels;
+//	char * PATH = "\\batch";
+//
+//	Search(PATH, &PictureInfo, &totalFiles);
+//
+//	if (totalFiles == 0)
+//	{
+//		return;
+//	}
+//
+//	if(!(buffer = malloc(512)))
+//	{
+//		return;
+//	}
+//	
+//	do{
+//		clearScreen(); // BLACK
+//		//find the file
+//		Search(PATH, &PictureInfo, &pics);
+//		
+//		//the first cluster of the file
+//		p = PictureInfo.deStartCluster + (((uint32_t)PictureInfo.deHighClust) << 16);
+//		
+//		sector = 0;
+//
+//		//read a sector
+//		FAT_LoadPartCluster(p, sector, buffer);
+//
+//		// total # of pixels to fill
+//		pixels = (uint32_t) 320 * 240;
+//
+//		// byte count
+//		j = 0; 
+//	
+//		while(pixels > 0)
+//		{
+//			writeColor(buffer[j]);  // write 16 bits
+//			pixels--;               // which is one pixel
+//			
+//			j++;                    // increment word count
+//			if (j == 256)           // time for a new sector
+//			{
+//				sector++;
+//				if (sector == SectorsPerClust)
+//				{
+//					p = FAT_NextCluster(p);	// read next cluster
+//					sector = 0;
+//				}
+//
+//				FAT_LoadPartCluster(p, sector, buffer);	// read a sector
+//				j = 0;
+//			}
+//		}
+//
+//		if(slideshowFlag)
+//		{
+//			for (i = 0; i < 3; i++)	// delay for a while
+//			{
+//				delay(0xFFFF);
+//			}
+//
+//			pics++;					// increment picture number
+//			if (pics > totalFiles)	// if last
+//			{
+//				pics = 1;			// wrap around
+//			}
+//
+//		}
+//	} while(slideshowFlag);
+//	
+//	free(buffer);
+//}
+// **************************************************
