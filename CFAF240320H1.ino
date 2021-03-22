@@ -5,13 +5,13 @@
 //
 //  This code uses the 8-bit parallel MCU mode of the display.
 //
-//  https://www.crystalfontz.com/product/cfah1604atmijt-character-display-16x4
+//  https://www.crystalfontz.com/product/cfaf240320h1022t-240x320-color-tft-display
 //
-//  The controller is a Sitronix ST7066U:
-//    https://www.crystalfontz.com/controllers/Sitronix/ST7066U
+//  The controller is a Sitronix ST7789V:
+//    https://www.crystalfontz.com/controllers/Sitronix/ST7789V 
 //
 //  Seeeduino v4.2, an open-source 3.3v capable Arduino clone.
-//    https://www.seeedstudio.com/Seeeduino-V4.2-p-2517.html
+//    https://www.crystalfontz.com/product/cfapn15062-seeeduino-arduino-clone-microprocessor
 //    https://github.com/SeeedDocument/SeeeduinoV4/raw/master/resources/Seeeduino_v4.2_sch.pdf
 //============================================================================
 //
@@ -50,27 +50,25 @@
 // LCD & USD control lines
 //   ARD      | Port |			  |  Function					| Wire
 //------------+------+------------+-----------------------------+------------
-//  5V	      |		 | #2         |  POWER 5V					| Red
-//  GND	      |		 | #1 #2 #31  |  GROUND						| Black
-//  3.3V      |		 | #13-15     |  POWER 3.3V					| Green
-//  GND	      |		 | #16        |  GROUND						| Black
-//  N/A	      |		 | #3         |  POWER 1V					| Orange
+// GND        |      |#1,2,16,31  | GROUND | Black
+// 3.3V       |      |#3,13-15,29-30| POWER 3.3V | Red
 // -----------+------+------------+-----------------------------+------------
 //  #8/D8     |  PB0 | #4         |  Chip Enable Signal (CS)	| Purple
 //  #9/D9     |  PB1 | #5         |  Data/Instruction   (RS)	| Yellow
-// #10/D10    |  PB2 | #6         |  Read/Write         (WR)	| Grey
-// #10/D11    |  PB2 | #7         |  Read/Write         (RD)	| Brown
-// #11/D12    |  PB2 | #28        |  Reset		        (RESET) | Blue
+// #10/D10    |  PB2 | #6         |  Write              (WR)	| Grey
+// #10/D11    |  PB2 | #7         |  Read               (RD)	| Brown
+// #11/D12    |  PB2 | #28        |  Reset              (RESET) | Blue
 // -----------+------+------------+-----------------------------+------------
-//  #0/D0     |  PD0 | #20        |  LCD_D10 (DB0)				| Purple
-//  #1/D1     |  PD1 | #21        |  LCD_D11 (DB1)				| Green
-//  #2/D2     |  PD2 | #22        |  LCD_D12 (DB2)				| Orange
-//  #3/D3     |  PD3 | #23        |  LCD_D13 (DB3)				| Yellow
-//  #4/D4     |  PD4 | #24        |  LCD_D14 (DB4)				| Grey
-//  #5/D5     |  PD5 | #25        |  LCD_D15 (DB5)				| Brown
-//  #6/D6     |  PD6 | #26        |  LCD_D16 (DB6)				| White
-//  #7/D7     |  PD7 | #27        |  LCD_D17 (DB7)				| Black
+//  #0/D0     |  PD0 | #20        |  LCD_D10 (DB0)		| Purple
+//  #1/D1     |  PD1 | #21        |  LCD_D11 (DB1)		| Green
+//  #2/D2     |  PD2 | #22        |  LCD_D12 (DB2)		| Orange
+//  #3/D3     |  PD3 | #23        |  LCD_D13 (DB3)		| Yellow
+//  #4/D4     |  PD4 | #24        |  LCD_D14 (DB4)		| Grey
+//  #5/D5     |  PD5 | #25        |  LCD_D15 (DB5)		| Brown
+//  #6/D6     |  PD6 | #26        |  LCD_D16 (DB6)		| White
+//  #7/D7     |  PD7 | #27        |  LCD_D17 (DB7)		| Black
 // -----------+------+------------+-----------------------------+------------
+//No Connection - 8-12, 17-19, 32
 //============================================================================
 
 
